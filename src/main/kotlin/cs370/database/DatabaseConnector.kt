@@ -5,7 +5,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 object DatabaseConnector {
-    private const val URL = "jdbc:sqlite:db/db.db"
+    private const val URL = "jdbc:postgresql://100.70.123.115:5432/habit-tracking?user=raspi&password=370"
 
     fun connect(): Connection? {
         var conn: Connection? = null

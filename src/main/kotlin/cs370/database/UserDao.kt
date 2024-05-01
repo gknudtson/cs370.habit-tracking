@@ -11,7 +11,8 @@ class UserDao(private val connection: Connection?) {
                 stmt.setInt(1, id)
                 val rs = stmt.executeQuery()
                 if (rs.next()) {  // Move the cursor to the first row and check if the row exists
-                    return User(rs.getInt("user_id"), rs.getString("username"), rs.getString("email"))
+                    return User(rs.getInt("user_id"), rs.getString("username"),
+                        rs.getString("email"))
                 }
             }
         } catch (e: SQLException) {

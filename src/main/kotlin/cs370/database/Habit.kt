@@ -1,4 +1,6 @@
 package cs370.database
 
-class Habit {
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Habit(val habitId: Int,val userId: Int, val name: String, val label: String)
