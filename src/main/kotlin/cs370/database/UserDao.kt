@@ -7,10 +7,10 @@ class UserDao {
         val query = "SELECT * FROM users WHERE id = ?"
         try {
             DatabaseConnector.connect().use { conn ->
-                conn.prepareStatement(query).use { stmt ->
-                    stmt.setInt(1, id)
-                    val rs = stmt.executeQuery()
-                    if (rs.next()) {
+                conn?.prepareStatement(query).use { stmt ->
+                    stmt?.setInt(1, id)
+                    val rs = stmt?.executeQuery()
+                    if (rs?.next() != null && rs.next()) {
                         return User(rs.getInt("id"), rs.getString("name"), rs.getString("email"))
                     }
                 }
@@ -21,16 +21,16 @@ class UserDao {
         return null
     }
 
-    val allUsers: List<User>
+    val allUsers: List<User>?
         get() {
-            val users: MutableList<User> = ArrayList()
+            val users: MutableList<User>? = ArrayList()
             val query = "SELECT * FROM users"
             try {
                 DatabaseConnector.connect().use { conn ->
-                    conn.prepareStatement(query).use { stmt ->
+                    conn?.prepareStatement(query)?.use { stmt ->
                         stmt.executeQuery().use { rs ->
                             while (rs.next()) {
-                                users.add(
+                                users?.add(
                                     User(
                                         rs.getInt("id"),
                                         rs.getString("name"),
@@ -51,7 +51,7 @@ class UserDao {
         val query = "INSERT INTO users (name, email) VALUES (?, ?)"
         try {
             DatabaseConnector.connect().use { conn ->
-                conn.prepareStatement(query).use { stmt ->
+                conn?.prepareStatement(query)?.use { stmt ->
                     stmt.setString(1, user.name)
                     stmt.setString(2, user.email)
                     val affectedRows = stmt.executeUpdate()
@@ -67,8 +67,8 @@ class UserDao {
     fun updateUser(user: User): Boolean {
         val query = "UPDATE users SET name = ?, email = ? WHERE id = ?"
         try {
-            DatabaseConnector.connect().use { conn ->
-                conn.prepareStatement(query).use { stmt ->
+            DatabaseConnector.connect()?.use { conn ->
+                conn.prepareStatement(query)?.use { stmt ->
                     stmt.setString(1, user.name)
                     stmt.setString(2, user.email)
                     stmt.setInt(3, user.id)
@@ -85,8 +85,8 @@ class UserDao {
     fun deleteUser(id: Int): Boolean {
         val query = "DELETE FROM users WHERE id = ?"
         try {
-            DatabaseConnector.connect().use { conn ->
-                conn.prepareStatement(query).use { stmt ->
+            DatabaseConnector.connect()?.use { conn ->
+                conn.prepareStatement(query)?.use { stmt ->
                     stmt.setInt(1, id)
                     val affectedRows = stmt.executeUpdate()
                     return affectedRows > 0
