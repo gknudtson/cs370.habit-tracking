@@ -48,4 +48,12 @@ class DatabaseInitializer(private val connection: Connection?) {
             e.printStackTrace()
         }
     }
+
+    // Code for testing purposes
+    private val userDao = UserDao(connection!!)
+    fun initializeTestUsers() {
+        if (userDao.allUsers?.size == 0) {
+            testUsers.forEach(userDao::insertUser)
+        }
+    }
 }

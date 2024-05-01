@@ -2,6 +2,8 @@ package cs370.plugins
 
 import cs370.database.User
 import cs370.database.testUsers
+import cs370.userDao
+import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.resources.*
@@ -16,11 +18,12 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText("Hello World!")
         }
-        get("/user/{id}") {
-            val id = call.parameters["id"]
-            val user: User = testUsers.find { it.id == id!!.toInt() }!!
+        get("/users/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid parameter.")
+            val user = userDao.getUser(id) ?: return@get call.respond(HttpStatusCode.NotFound, "User with id $id not found.")
             call.respond(user)
         }
+
         get<Articles> { article ->
             // Get all articles ...
             call.respond("List of articles sorted starting from ${article.sort}")
