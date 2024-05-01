@@ -19,18 +19,17 @@ fun Application.configureRouting() {
             call.respondText("Hello World!")
         }
         get("/users/{id}") {
-            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid parameter.")
-            val user = userDao.getUser(id) ?: return@get call.respond(HttpStatusCode.NotFound, "User with id $id not found.")
+            val id = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(
+                HttpStatusCode.BadRequest,
+                "Invalid parameter."
+            )
+            val user =
+                userDao.getUser(id) ?: return@get call.respond(HttpStatusCode.NotFound, "User with id $id not found.")
             call.respond(user)
         }
-
-        get<Articles> { article ->
-            // Get all articles ...
-            call.respond("List of articles sorted starting from ${article.sort}")
+        get("/users") {
+            val users = userDao.allUsers ?: listOf()
+            call.respond(users)
         }
     }
 }
-
-@Serializable
-@Resource("/articles")
-class Articles(val sort: String? = "new")
