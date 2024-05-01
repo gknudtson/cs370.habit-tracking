@@ -11,7 +11,7 @@ object DatabaseConnector {
         var conn: Connection? = null
         try {
             conn = DriverManager.getConnection(URL)
-            println("Connection to SQLite has been established.")
+            println("Connection to postgresql has been established.")
         } catch (e: SQLException) {
             println(e.message)
         }

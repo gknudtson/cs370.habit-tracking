@@ -1,16 +1,14 @@
 package cs370
 
 
+import cs370.database.*
 import cs370.plugins.configureRouting
 import cs370.plugins.configureSerialization
-import cs370.database.DatabaseConnector
-import cs370.database.DatabaseInitializer
-import cs370.database.UserDao
-import cs370.database.testUsers
 import io.ktor.server.application.*
 
 var connection: java.sql.Connection? = DatabaseConnector.connect()
 var userDao = UserDao(connection)
+var habitDao = HabitDao(connection)
 
 fun main(args: Array<String>) {
     // Initialize tables
@@ -19,6 +17,7 @@ fun main(args: Array<String>) {
     dbInit.createNewTables()
     // Test
     dbInit.initializeTestUsers()
+    dbInit.initializeTestHabits()
     // Run server
     io.ktor.server.netty.EngineMain.main(args)
 }

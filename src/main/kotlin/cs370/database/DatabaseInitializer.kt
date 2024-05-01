@@ -1,5 +1,6 @@
 package cs370.database
 
+import cs370.habitDao
 import java.sql.Connection
 import java.sql.SQLException
 
@@ -51,6 +52,11 @@ class DatabaseInitializer(private val connection: Connection?) {
     fun initializeTestUsers() {
         if (userDao.allUsers?.size == 0) {
             testUsers.forEach(userDao::insertUser)
+        }
+    }
+    fun initializeTestHabits() {
+        if (habitDao.allHabits?.size == 0) {
+            testHabits.forEach(habitDao::insertHabit)
         }
     }
 }

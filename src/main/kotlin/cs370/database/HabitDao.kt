@@ -51,20 +51,25 @@ class HabitDao(private val connection: Connection?) {
         }
 
     fun insertHabit(habit: Habit): Boolean {
-        val query = "INSERT INTO Habits (user_id, habit_name, custom_label) VALUES (?, ?, ?)"
+        val query = "INSERT INTO Habits (user_id, habit_name, custom_label) VALUES (?, ?, ?) RETURNING habit_id"
         try {
             connection?.prepareStatement(query)?.use { stmt ->
                 stmt.setInt(1, habit.userId)
                 stmt.setString(2, habit.name)
                 stmt.setString(3, habit.label)
-                val affectedRows = stmt.executeUpdate()
-                return affectedRows > 0
+                val rs = stmt.executeQuery()
+                if (rs.next()) {
+                    val habitId = rs.getInt(1)
+                    println("Inserted Habit with ID: $habitId")
+                    return true
+                }
             }
         } catch (e: SQLException) {
             e.printStackTrace()
         }
         return false
     }
+
 
     fun updateHabit(habit: Habit): Boolean {
         val query = "UPDATE Habits SET habit_name = ?, custom_label = ? WHERE habit_id = ?"
