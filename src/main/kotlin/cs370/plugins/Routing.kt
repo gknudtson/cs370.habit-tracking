@@ -12,7 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 fun Application.configureRouting() {
     install(Resources)
@@ -105,7 +105,7 @@ fun Application.configureRouting() {
                     userId = habitDTO.userId,
                     name = habitDTO.name,
                     label = habitDTO.label,
-                    dueDate = parsedDate.toKotlinxLocalDate()
+                    dueDate = parsedDate
                 )
 
                 // Insert the new habit into the database
