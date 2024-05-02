@@ -130,5 +130,18 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, "Habit not found")
             }
         }
+        get("/habits/byName/{name}") {
+            val name = call.parameters["name"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Name parameter is required")
+            try {
+                val habits = habitDao.getHabitsByName(name)
+                if (habits.isNotEmpty()) {
+                    call.respond(habits)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "No habits found with name '$name'")
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "Error accessing database: ${e.message}")
+            }
+        }
     }
 }
