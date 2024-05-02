@@ -5,7 +5,6 @@ import cs370.database.User
 import cs370.habitDao
 import cs370.userDao
 import cs370.util.HabitDTO
-import cs370.util.toKotlinxLocalDate
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -128,19 +127,6 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.OK, "Habit deleted successfully")
             } else {
                 call.respond(HttpStatusCode.NotFound, "Habit not found")
-            }
-        }
-        get("/habits/byName/{name}") {
-            val name = call.parameters["name"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Name parameter is required")
-            try {
-                val habits = habitDao.getHabitsByName(name)
-                if (habits.isNotEmpty()) {
-                    call.respond(habits)
-                } else {
-                    call.respond(HttpStatusCode.NotFound, "No habits found with name '$name'")
-                }
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, "Error accessing database: ${e.message}")
             }
         }
     }

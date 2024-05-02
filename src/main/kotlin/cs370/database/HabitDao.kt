@@ -129,30 +129,4 @@ class HabitDao(private val connection: Connection?) {
         }
         return false
     }
-
-    fun getHabitsByName(name: String): List<Habit> {
-        val habits = mutableListOf<Habit>()
-        val query = "SELECT * FROM Habits WHERE habit_name LIKE ?"
-        try {
-            connection?.prepareStatement(query)?.use { stmt ->
-                stmt.setString(1, "%$name%")  // Use LIKE for partial matching
-                val rs = stmt.executeQuery()
-                while (rs.next()) {
-                    habits.add(
-                        Habit(
-                            rs.getInt("habit_id"),
-                            rs.getInt("user_id"),
-                            rs.getString("habit_name"),
-                            rs.getString("custom_label"),
-                            rs.getDate("due_date")?.toLocalDate()?.toKotlinxLocalDate()
-                        )
-                    )
-                }
-            }
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-        return habits
-    }
-
 }
