@@ -21,6 +21,7 @@ class DatabaseInitializer(private val connection: Connection?) {
                 user_id INTEGER NOT NULL,
                 habit_name TEXT NOT NULL,
                 custom_label TEXT,
+                due_date DATE,
                 FOREIGN KEY(user_id) REFERENCES Users(user_id)
             );
             """.trimIndent()

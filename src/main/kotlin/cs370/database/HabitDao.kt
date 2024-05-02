@@ -1,7 +1,11 @@
 package cs370.database
 
+import cs370.util.toKotlinxLocalDate
 import java.sql.Connection
 import java.sql.SQLException
+import kotlinx.datetime.toJavaLocalDate
+import java.sql.Date;
+import kotlin.collections.ArrayList
 
 class HabitDao(private val connection: Connection?) {
     fun getHabit(habitId: Int): Habit? {
@@ -15,7 +19,8 @@ class HabitDao(private val connection: Connection?) {
                         rs.getInt("habit_id"),
                         rs.getInt("user_id"),
                         rs.getString("habit_name"),
-                        rs.getString("custom_label")
+                        rs.getString("custom_label"),
+                        rs.getDate("due_date")?.toLocalDate()?.toKotlinxLocalDate()
                     )
                 }
             }
@@ -38,7 +43,8 @@ class HabitDao(private val connection: Connection?) {
                                     rs.getInt("habit_id"),
                                     rs.getInt("user_id"),
                                     rs.getString("habit_name"),
-                                    rs.getString("custom_label")
+                                    rs.getString("custom_label"),
+                                    rs.getDate("due_date")?.toLocalDate()?.toKotlinxLocalDate()
                                 )
                             )
                         }
@@ -51,18 +57,15 @@ class HabitDao(private val connection: Connection?) {
         }
 
     fun insertHabit(habit: Habit): Boolean {
-        val query = "INSERT INTO Habits (user_id, habit_name, custom_label) VALUES (?, ?, ?) RETURNING habit_id"
+        val query = "INSERT INTO Habits (user_id, habit_name, custom_label, due_date) VALUES (?, ?, ?, ?)"
         try {
             connection?.prepareStatement(query)?.use { stmt ->
                 stmt.setInt(1, habit.userId)
                 stmt.setString(2, habit.name)
                 stmt.setString(3, habit.label)
-                val rs = stmt.executeQuery()
-                if (rs.next()) {
-                    val habitId = rs.getInt(1)
-                    println("Inserted Habit with ID: $habitId")
-                    return true
-                }
+                stmt.setDate(4, habit.dueDate?.let { date -> Date.valueOf(date.toJavaLocalDate()) })
+                stmt.executeUpdate()
+                return true
             }
         } catch (e: SQLException) {
             e.printStackTrace()
@@ -72,12 +75,13 @@ class HabitDao(private val connection: Connection?) {
 
 
     fun updateHabit(habit: Habit): Boolean {
-        val query = "UPDATE Habits SET habit_name = ?, custom_label = ? WHERE habit_id = ?"
+        val query = "UPDATE Habits SET habit_name = ?, custom_label = ?, due_date = ? WHERE habit_id = ?"
         try {
             connection?.prepareStatement(query)?.use { stmt ->
                 stmt.setString(1, habit.name)
                 stmt.setString(2, habit.label)
-                stmt.setInt(3, habit.habitId)
+                stmt.setDate(3, habit.dueDate?.let { Date.valueOf(it.toJavaLocalDate()) }) // Handle dueDate
+                stmt.setInt(4, habit.habitId)
                 val affectedRows = stmt.executeUpdate()
                 return affectedRows > 0
             }

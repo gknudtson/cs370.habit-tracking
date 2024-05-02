@@ -2,18 +2,14 @@ package cs370.plugins
 
 import cs370.database.Habit
 import cs370.database.User
-import cs370.database.testUsers
 import cs370.habitDao
 import cs370.userDao
 import io.ktor.http.*
-import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
-import io.ktor.server.resources.Resources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 
 fun Application.configureRouting() {
     install(Resources)
@@ -34,6 +30,49 @@ fun Application.configureRouting() {
             val users = userDao.allUsers ?: listOf()
             call.respond(users)
         }
+        post("/users") {
+            val newUser = call.receive<User>()
+            try {
+                if (userDao.insertUser(newUser)) {
+                    call.respond(HttpStatusCode.Created, "User created successfully")
+                } else {
+                    call.respond(HttpStatusCode.Conflict, "User could not be created")
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "Error creating user")
+            }
+        }
+        delete("/users/{id}") {
+            val userId = call.parameters["id"]?.toIntOrNull()
+            if (userId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
+                return@delete
+            }
+
+            try {
+                if (userDao.deleteUser(userId)) {
+                    call.respond(HttpStatusCode.OK, "User deleted successfully")
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "User not found")
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "Error deleting user")
+            }
+        }
+
+        get("/habits/{id}") {
+            val habitId = call.parameters["id"]?.toIntOrNull()
+            if (habitId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid habit ID")
+                return@get
+            }
+            val habit = habitDao.getHabit(habitId)
+            if (habit != null) {
+                call.respond(habit)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Habit with id $habitId not found.")
+            }
+        }
         get("/habits") {
             val habits = habitDao.allHabits ?: listOf()
             call.respond(habits)
@@ -47,6 +86,17 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.InternalServerError, "Error creating habit")
             }
         }
-
+        delete("/deleteHabit/{id}") {
+            val habitId = call.parameters["id"]?.toIntOrNull() ?: return@delete call.respond(
+                HttpStatusCode.BadRequest,
+                "Invalid parameter."
+            )
+            val success = habitDao.deleteHabit(habitId)
+            if (success) {
+                call.respond(HttpStatusCode.OK, "Habit deleted successfully")
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Habit not found")
+            }
+        }
     }
 }

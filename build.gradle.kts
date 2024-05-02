@@ -32,6 +32,8 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:2.3.10")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-// https://mvnrepository.com/artifact/org.postgresql/postgresql
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
     implementation("org.postgresql:postgresql:42.7.3")
+    // https://github.com/Kotlin/kotlinx-datetime
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
 }
