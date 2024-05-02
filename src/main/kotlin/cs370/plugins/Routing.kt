@@ -73,6 +73,19 @@ fun Application.configureRouting() {
                 call.respond(HttpStatusCode.NotFound, "Habit with id $habitId not found.")
             }
         }
+        get("/habits/byLabel/{label}") {
+            val label = call.parameters["label"]
+            if (label == null) {
+                call.respond(HttpStatusCode.BadRequest, "Label parameter is required")
+                return@get
+            }
+            val habits = habitDao.getHabitsByLabel(label)
+            if (habits.isNotEmpty()) {
+                call.respond(habits)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "No habits found with label '$label'")
+            }
+        }
         get("/habits") {
             val habits = habitDao.allHabits ?: listOf()
             call.respond(habits)

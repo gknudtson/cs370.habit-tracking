@@ -30,6 +30,31 @@ class HabitDao(private val connection: Connection?) {
         return null
     }
 
+    fun getHabitsByLabel(label: String): List<Habit> {
+        val habits = mutableListOf<Habit>()
+        val query = "SELECT * FROM Habits WHERE custom_label = ?"
+        try {
+            connection?.prepareStatement(query)?.use { stmt ->
+                stmt.setString(1, label)
+                val rs = stmt.executeQuery()
+                while (rs.next()) {
+                    habits.add(
+                        Habit(
+                            rs.getInt("habit_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("habit_name"),
+                            rs.getString("custom_label"),
+                            rs.getDate("due_date")?.toLocalDate()?.toKotlinxLocalDate()
+                        )
+                    )
+                }
+            }
+        } catch (e: SQLException) {
+            e.printStackTrace()
+        }
+        return habits
+    }
+
     val allHabits: List<Habit>?
         get() {
             val habits: MutableList<Habit> = ArrayList()
