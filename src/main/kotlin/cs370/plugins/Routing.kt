@@ -4,12 +4,15 @@ import cs370.database.Habit
 import cs370.database.User
 import cs370.habitDao
 import cs370.userDao
+import cs370.util.HabitDTO
+import cs370.util.toKotlinxLocalDate
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.time.LocalDate
 
 fun Application.configureRouting() {
     install(Resources)
@@ -91,12 +94,28 @@ fun Application.configureRouting() {
             call.respond(habits)
         }
         post("/createHabit") {
-            val newHabit = call.receive<Habit>()
+            val habitDTO = call.receive<HabitDTO>()
             try {
-                habitDao.insertHabit(newHabit)
-                call.respond(HttpStatusCode.Created, "Habit created successfully")
+                // Parse the date from string to kotlinx.datetime.LocalDate
+                val parsedDate = LocalDate.parse(habitDTO.dueDate)
+
+                // Create a Habit object from the DTO
+                val newHabit = Habit(
+                    habitId = -1,
+                    userId = habitDTO.userId,
+                    name = habitDTO.name,
+                    label = habitDTO.label,
+                    dueDate = parsedDate.toKotlinxLocalDate()
+                )
+
+                // Insert the new habit into the database
+                if (habitDao.insertHabit(newHabit)) {
+                    call.respond(HttpStatusCode.Created, "Habit created successfully")
+                } else {
+                    call.respond(HttpStatusCode.InternalServerError, "Error creating habit")
+                }
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, "Error creating habit")
+                call.respond(HttpStatusCode.BadRequest, "Error parsing date or creating habit: ${e.message}")
             }
         }
         delete("/deleteHabit/{id}") {

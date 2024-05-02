@@ -105,7 +105,7 @@ class HabitDao(private val connection: Connection?) {
             connection?.prepareStatement(query)?.use { stmt ->
                 stmt.setString(1, habit.name)
                 stmt.setString(2, habit.label)
-                stmt.setDate(3, habit.dueDate?.let { Date.valueOf(it.toJavaLocalDate()) }) // Handle dueDate
+                stmt.setDate(3, habit.dueDate?.let { Date.valueOf(it.toJavaLocalDate()) })
                 stmt.setInt(4, habit.habitId)
                 val affectedRows = stmt.executeUpdate()
                 return affectedRows > 0
